@@ -12,21 +12,25 @@ load_dotenv()
 class ChatState(TypedDict):
     messages: Annotated[list[BaseMessage], add_messages]
 
-llm = ChatOpenAI(model='gpt-4o-mini',temperature=0, api_key=os.getenv('OPENAI_API_KEY'))
-
-def chat_node(state: ChatState) -> ChatState:
-    msg = state['messages']
-    response = llm.invoke(state['messages'])
-    return {'messages': [response]}
-
+# llm = ChatOpenAI(model='gpt-4o-mini',temperature=0, api_key=os.getenv('OPENAI_API_KEY'))
 memory = InMemorySaver()
-builder = StateGraph(ChatState)
-builder.add_node('chat_node', chat_node)
 
-builder.add_edge(START, 'chat_node')
-builder.add_edge('chat_node', END)
+def build_chatbot(api_key: str, model: str):
+    llm = ChatOpenAI(model=model, temperature=0, api_key=api_key)
 
-chatbot = builder.compile(checkpointer = memory)
+    def chat_node(state: ChatState) -> ChatState:
+        msg = state['messages']
+        response = llm.invoke(state['messages'])
+        return {'messages': [response]}
+
+    builder = StateGraph(ChatState)
+    builder.add_node('chat_node', chat_node)
+
+    builder.add_edge(START, 'chat_node')
+    builder.add_edge('chat_node', END)
+
+    chatbot = builder.compile(checkpointer = memory)
+    return chatbot
 
 
 # initial_state = {

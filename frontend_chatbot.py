@@ -1,7 +1,27 @@
 import streamlit as st 
-from backend_chatbot import chatbot
+from backend_chatbot import build_chatbot
 from langchain_core.messages import HumanMessage
-# st.title("Chatbot Interface")
+
+st.set_page_config(page_title="Dynamic Chatbot")
+
+# st.title("🤖 Chatbot with Custom API Key")
+st.markdown("<h4>🤖 Chatbot with Custom API Key</h4>", unsafe_allow_html=True)
+
+
+# 🔑 Sidebar inputs
+st.sidebar.header("Configuration")
+api_key = st.sidebar.text_input("Enter OpenAI API Key", type="password")
+model = st.sidebar.selectbox(
+    "Select Model",
+    ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"]
+)
+
+# Build chatbot only when key is provided
+if api_key:
+    chatbot = build_chatbot(api_key, model)
+else:
+    st.warning("Please enter API key to start")
+    st.stop()
 
 # message_history = []
 CONFIG = {"configurable": {"thread_id": "thread-1"}}
@@ -14,6 +34,7 @@ for message in st.session_state['message_history']:
     with st.chat_message(message['role']):
         st.text(message['content'])
 
+# older message format to be stored in session state
 # {'role': 'user', 'content': 'What is the capital of France?'}
 # {'role': 'assistant', 'content': 'The capital of France is Paris.'}
 
