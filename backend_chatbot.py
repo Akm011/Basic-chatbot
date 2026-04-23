@@ -32,12 +32,3 @@ def build_chatbot(api_key: str, model: str):
     chatbot = builder.compile(checkpointer = memory)
     return chatbot
 
-
-# initial_state = {
-#     'messages': [HumanMessage(content='What is the capital of india')]
-# }
-
-# config: RunnableConfig = {"configurable": {"thread_id": "1"}}
-
-# res = chatbot.invoke(initial_state, config=config)['messages'][-1].content
-# print(res)
